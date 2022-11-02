@@ -14,18 +14,25 @@ list(APPEND FastSIMD_headers ${FastSIMD_inline})
 list(APPEND FastSIMD_headers ${FastSIMD_include_inl})
 list(APPEND FastSIMD_internal_headers ${FastSIMD_internal_inl})
 
-set(FastSIMD_sources
-    FastSIMD/FastSIMD.cpp
-    FastSIMD/FastSIMD_Level_AVX2.cpp
-    FastSIMD/FastSIMD_Level_AVX512.cpp
-    FastSIMD/FastSIMD_Level_NEON.cpp
-    FastSIMD/FastSIMD_Level_Scalar.cpp
-    FastSIMD/FastSIMD_Level_SSE2.cpp
-    FastSIMD/FastSIMD_Level_SSE3.cpp
-    FastSIMD/FastSIMD_Level_SSE41.cpp
-    FastSIMD/FastSIMD_Level_SSE42.cpp
-    FastSIMD/FastSIMD_Level_SSSE3.cpp
-)
+IF(EMSCRIPTEN)
+    set(FastSIMD_sources
+        FastSIMD/FastSIMD.cpp
+        FastSIMD/FastSIMD_Level_Scalar.cpp
+    )
+else()
+    set(FastSIMD_sources
+        FastSIMD/FastSIMD.cpp
+        FastSIMD/FastSIMD_Level_AVX2.cpp
+        FastSIMD/FastSIMD_Level_AVX512.cpp
+        FastSIMD/FastSIMD_Level_NEON.cpp
+        FastSIMD/FastSIMD_Level_Scalar.cpp
+        FastSIMD/FastSIMD_Level_SSE2.cpp
+        FastSIMD/FastSIMD_Level_SSE3.cpp
+        FastSIMD/FastSIMD_Level_SSE41.cpp
+        FastSIMD/FastSIMD_Level_SSE42.cpp
+        FastSIMD/FastSIMD_Level_SSSE3.cpp
+    )
+endif()
 
 file(GLOB FastNoise_headers "../include/FastNoise/*.h")
 file(GLOB FastNoise_inl "../include/FastNoise/*.inl")
@@ -98,16 +105,7 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}"
     endif()
 
     if(EMSCRIPTEN)
-        if(CMAKE_SIZEOF_VOID_P EQUAL 4 OR "${CMAKE_CXX_FLAGS}" MATCHES "-m32")
-            set_source_files_properties(FastSIMD/FastSIMD_Level_Scalar.cpp PROPERTIES COMPILE_FLAGS "-msse -mrelaxed-simd")
-            set_source_files_properties(FastSIMD/FastSIMD_Level_SSE2.cpp PROPERTIES COMPILE_FLAGS "-msse2 -mrelaxed-simd")
-        endif()
-        set_source_files_properties(FastSIMD/FastSIMD_Level_SSE3.cpp PROPERTIES COMPILE_FLAGS "-msse3 -mrelaxed-simd")
-        set_source_files_properties(FastSIMD/FastSIMD_Level_SSSE3.cpp PROPERTIES COMPILE_FLAGS "-mssse3 -mrelaxed-simd")
-        set_source_files_properties(FastSIMD/FastSIMD_Level_SSE41.cpp PROPERTIES COMPILE_FLAGS "-msse4.1 -mrelaxed-simd")
-        set_source_files_properties(FastSIMD/FastSIMD_Level_SSE42.cpp PROPERTIES COMPILE_FLAGS "-msse4.2 -mrelaxed-simd")
-        set_source_files_properties(FastSIMD/FastSIMD_Level_AVX2.cpp PROPERTIES COMPILE_FLAGS "-mavx2 -mfma -mrelaxed-simd")
-        set_source_files_properties(FastSIMD/FastSIMD_Level_AVX512.cpp PROPERTIES COMPILE_FLAGS "-mavx512f -mavx512dq -mfma -mrelaxed-simd")
+        set_source_files_properties(FastSIMD/FastSIMD_Level_Scalar.cpp PROPERTIES COMPILE_FLAGS "-msse -mrelaxed-simd")
     else()
         if(CMAKE_SIZEOF_VOID_P EQUAL 4 OR "${CMAKE_CXX_FLAGS}" MATCHES "-m32")
             set_source_files_properties(FastSIMD/FastSIMD_Level_Scalar.cpp PROPERTIES COMPILE_FLAGS "-msse")
